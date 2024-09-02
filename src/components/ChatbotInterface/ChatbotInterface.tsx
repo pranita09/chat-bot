@@ -20,11 +20,12 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
   setVisibleBot,
 }) => {
   const [messages, setMessages] = useState<
-    { sender: "bot" | "user"; text: string }[]
+    { sender: "bot" | "user"; text: string; isTyping?: boolean }[]
   >([{ sender: "bot", text: "Hi, how can I help you?" }]);
   const [inputMessage, setInputMessage] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
   const interfaceBodyRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const sendMessage = () => {
     if (!inputMessage.trim()) return;
@@ -33,15 +34,24 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
     setInputMessage("");
     setIsSending(true);
 
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { sender: "bot", text: "", isTyping: true },
+    ]);
+
     setTimeout(() => {
       const randomResponse =
         botResponses[Math.floor(Math.random() * botResponses.length)];
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { sender: "bot", text: randomResponse },
-      ]);
+      setMessages((prevMessages) => {
+        const updatedMessages = [...prevMessages];
+        updatedMessages[updatedMessages.length - 1] = {
+          sender: "bot",
+          text: randomResponse,
+        };
+        return updatedMessages;
+      });
       setIsSending(false);
-    }, 2000);
+    }, 3000);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +71,12 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (!isSending && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [visibleBot, isSending]);
+
   return (
     <>
       {visibleBot === false && (
@@ -76,11 +92,17 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
           </div>
           <div className="interfaceBody" ref={interfaceBodyRef}>
             {messages.map((msg, index) => (
-              <ChatMessage key={index} sender={msg.sender} text={msg.text} />
+              <ChatMessage
+                key={index}
+                sender={msg.sender}
+                text={msg.text}
+                isTyping={msg.isTyping}
+              />
             ))}
           </div>
           <div className="inputContainer">
             <input
+              ref={inputRef}
               type="text"
               className="textInput"
               placeholder="Type your message..."

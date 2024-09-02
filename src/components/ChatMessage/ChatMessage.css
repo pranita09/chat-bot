@@ -1,7 +1,7 @@
 .chatMessage {
   display: flex;
   align-items: center;
-  margin: 10px 0 20px 0;
+  margin: 10px 0 10px 0;
 }
 
 .chatMessage.bot {
@@ -13,7 +13,7 @@
 }
 
 .chatMessage.bot .messageText {
-  border-radius: 15px 15px 15px 0;
+  border-radius: 0 15px 15px 15px;
   background-color: #e1e1e1;
 }
 
@@ -34,7 +34,15 @@
 
 .avatar {
   font-size: 24px;
-  margin: 0 10px;
+  margin: 0 5px;
+  background-color: rgb(221, 225, 227);
+  border-radius: 50%;
+  padding: 15px;
+  height: 15px;
+  width: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .messageText {

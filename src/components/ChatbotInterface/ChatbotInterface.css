@@ -1,9 +1,9 @@
 .interfaceContainer {
   position: fixed;
   top: 50%;
-  left: 50%;
+  left: 80%;
   transform: translate(-50%, -50%);
-  width: 500px;
+  width: 450px;
   height: 600px;
   max-width: 90%;
   background-color: white;
@@ -72,7 +72,7 @@
 .sendButton {
   width: 15%;
   margin-left: 5px;
-  padding: 8px;
+  padding: 10px;
   background-color: #007bff;
   color: white;
   border: none;
@@ -83,4 +83,8 @@
 .sendButton:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+.textInput:focus {
+  outline: 2px solid #007bff;
 }
