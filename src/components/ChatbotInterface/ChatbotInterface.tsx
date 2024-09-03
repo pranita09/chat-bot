@@ -1,4 +1,5 @@
 import "./ChatbotInterface.css";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { MdOutlineCancel } from "react-icons/md";
 import React, {
   Dispatch,
@@ -27,6 +28,87 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
   const interfaceBodyRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  //   const getAPIResponse = async () => {
+  //     try {
+  //       const response = await axios.post(
+  //         "https://api.openai.com/v1/chat/completions",
+  //         {
+  //           model: "gpt-3.5-turbo",
+  //           messages: [{ role: "user", content: inputMessage }],
+  //           max_tokens: 100,
+  //         },
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+  //           },
+  //         }
+  //       );
+
+  //       const botResponse = response.data.choices[0].message.content;
+  //       setMessages((prevMessages) => {
+  //         const updatedMessages = [...prevMessages];
+  //         updatedMessages[updatedMessages.length - 1] = {
+  //           sender: "bot",
+  //           text: botResponse,
+  //         };
+  //         return updatedMessages;
+  //       });
+  //     } catch (error) {
+  //       console.error("Error fetching OpenAI response:", error);
+  //       setMessages((prevMessages) => {
+  //         const updatedMessages = [...prevMessages];
+  //         updatedMessages[updatedMessages.length - 1] = {
+  //           sender: "bot",
+  //           text: "Sorry, there was an error getting a response. Please try again.",
+  //         };
+  //         return updatedMessages;
+  //       });
+  //     } finally {
+  //       setIsSending(false);
+  //     }
+  //   };
+
+  const getResponse = async () => {
+    try {
+      const genAI = new GoogleGenerativeAI(
+        "AIzaSyC5aIkJThuVWoob7Sow1HS1xmkDOgRGrzw"
+      );
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        generationConfig: {
+          //   candidateCount: 1,
+          //   stopSequences: ["x"],
+          maxOutputTokens: 150,
+          //   temperature: 1.0,
+        },
+      });
+
+      const result = await model.generateContent(inputMessage);
+      const botResponse = result.response.text();
+      setMessages((prevMessages) => {
+        const updatedMessages = [...prevMessages];
+        updatedMessages[updatedMessages.length - 1] = {
+          sender: "bot",
+          text: botResponse,
+        };
+        return updatedMessages;
+      });
+    } catch (error) {
+      console.error("Error fetching OpenAI response:", error);
+      setMessages((prevMessages) => {
+        const updatedMessages = [...prevMessages];
+        updatedMessages[updatedMessages.length - 1] = {
+          sender: "bot",
+          text: "Sorry, there was an error getting a response. Please try again.",
+        };
+        return updatedMessages;
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   const sendMessage = () => {
     if (!inputMessage.trim()) return;
 
@@ -39,19 +121,21 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
       { sender: "bot", text: "", isTyping: true },
     ]);
 
-    setTimeout(() => {
-      const randomResponse =
-        botResponses[Math.floor(Math.random() * botResponses.length)];
-      setMessages((prevMessages) => {
-        const updatedMessages = [...prevMessages];
-        updatedMessages[updatedMessages.length - 1] = {
-          sender: "bot",
-          text: randomResponse,
-        };
-        return updatedMessages;
-      });
-      setIsSending(false);
-    }, 3000);
+    getResponse();
+
+    // setTimeout(() => {
+    //   const randomResponse =
+    //     botResponses[Math.floor(Math.random() * botResponses.length)];
+    //   setMessages((prevMessages) => {
+    //     const updatedMessages = [...prevMessages];
+    //     updatedMessages[updatedMessages.length - 1] = {
+    //       sender: "bot",
+    //       text: randomResponse,
+    //     };
+    //     return updatedMessages;
+    //   });
+    //   setIsSending(false);
+    // }, 3000);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
