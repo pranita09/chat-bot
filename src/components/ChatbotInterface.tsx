@@ -237,6 +237,7 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
             <IconButton
               onClick={sendMessage}
               disabled={isSending || !inputMessage.trim()}
+              disableRipple={true}
               color="primary"
               sx={{ paddingRight: "0", paddingBottom: "0" }}
             >
