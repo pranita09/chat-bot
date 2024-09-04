@@ -8,7 +8,6 @@ import React, {
   useRef,
   useEffect,
 } from "react";
-import { botResponses } from "../../data";
 import { ChatMessage } from "../ChatMessage/ChatMessage";
 
 interface ChatbotInterfaceType {
@@ -28,7 +27,7 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
   const interfaceBodyRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const getResponse = async () => {
+  const getResponse = async (userMessage: string, index?: number) => {
     try {
       const genAI = new GoogleGenerativeAI(
         "AIzaSyC5aIkJThuVWoob7Sow1HS1xmkDOgRGrzw"
@@ -36,21 +35,23 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
       const model = genAI.getGenerativeModel({
         model: "gemini-pro",
         generationConfig: {
-          //   candidateCount: 1,
-          //   stopSequences: ["x"],
           maxOutputTokens: 150,
-          //   temperature: 1.0,
         },
       });
 
-      const result = await model.generateContent(inputMessage);
+      const result = await model.generateContent(userMessage);
       const botResponse = result.response.text();
       setMessages((prevMessages) => {
         const updatedMessages = [...prevMessages];
-        updatedMessages[updatedMessages.length - 1] = {
-          sender: "bot",
-          text: botResponse,
-        };
+        if (index !== undefined) {
+          updatedMessages[index] = { sender: "bot", text: botResponse };
+        } else {
+          updatedMessages[updatedMessages.length - 1] = {
+            sender: "bot",
+            text: botResponse,
+          };
+        }
+
         return updatedMessages;
       });
     } catch (error) {
@@ -80,7 +81,17 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
       { sender: "bot", text: "", isTyping: true },
     ]);
 
-    getResponse();
+    getResponse(inputMessage);
+  };
+
+  const handleRegenerate = (index: number) => {
+    const userMessage = messages[index - 1].text;
+    setMessages((prevMessages) => {
+      const updatedMessages = [...prevMessages];
+      updatedMessages[index] = { sender: "bot", text: "", isTyping: true };
+      return updatedMessages;
+    });
+    getResponse(userMessage, index);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,6 +137,7 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
                 sender={msg.sender}
                 text={msg.text}
                 isTyping={msg.isTyping}
+                onRegenerate={() => handleRegenerate(index)}
               />
             ))}
           </div>

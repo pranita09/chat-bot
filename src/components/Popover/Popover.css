@@ -1,0 +1,27 @@
+.popoverContainer {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 3px 5px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 5px;
+  top: 100%;
+  left: 12%;
+  z-index: 10;
+}
+
+.popoverButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popoverButton:hover {
+  background-color: #f0f0f0;
+}
