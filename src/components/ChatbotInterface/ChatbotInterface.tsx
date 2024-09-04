@@ -27,19 +27,30 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
   const interfaceBodyRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const constructContext = (maxContextLength: number = 5) => {
+    const contextMessages = messages.slice(-maxContextLength).map((msg) => {
+      return ` ${msg.text}`;
+    });
+    return contextMessages.join("\n");
+  };
+
   const getResponse = async (userMessage: string, index?: number) => {
     try {
       const genAI = new GoogleGenerativeAI(
         "AIzaSyC5aIkJThuVWoob7Sow1HS1xmkDOgRGrzw"
       );
       const model = genAI.getGenerativeModel({
-        model: "gemini-pro",
+        model: "gemini-1.5-flash-001",
         generationConfig: {
           maxOutputTokens: 150,
         },
       });
 
-      const result = await model.generateContent(userMessage);
+      const context = constructContext();
+
+      const result = await model.generateContent(
+        `${context}\nUser: ${userMessage}`
+      );
       const botResponse = result.response.text();
       setMessages((prevMessages) => {
         const updatedMessages = [...prevMessages];
