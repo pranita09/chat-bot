@@ -1,8 +1,8 @@
 import "./App.css";
 import logo from "./logo.svg";
 import { useState } from "react";
-import { ChatbotHandler } from "./components/ChatbotHandler/ChatbotHandler";
-import { ChatbotInterface } from "./components/ChatbotInterface/ChatbotInterface";
+import { ChatbotHandler } from "./components/ChatbotHandler";
+import { ChatbotInterface } from "./components/ChatbotInterface";
 
 function App() {
   const [visibleBot, setVisibleBot] = useState<boolean>(true);

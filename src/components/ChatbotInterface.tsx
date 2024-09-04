@@ -1,6 +1,4 @@
-import "./ChatbotInterface.css";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { MdOutlineCancel } from "react-icons/md";
 import React, {
   Dispatch,
   SetStateAction,
@@ -8,7 +6,10 @@ import React, {
   useRef,
   useEffect,
 } from "react";
-import { ChatMessage } from "../ChatMessage/ChatMessage";
+import { Box, Paper, Typography, IconButton, TextField } from "@mui/material";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import TelegramIcon from "@mui/icons-material/Telegram";
+import { ChatMessage } from "./ChatMessage";
 
 interface ChatbotInterfaceType {
   visibleBot: Boolean;
@@ -29,7 +30,7 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
 
   const constructContext = (maxContextLength: number = 5) => {
     const contextMessages = messages.slice(-maxContextLength).map((msg) => {
-      return ` ${msg.text}`;
+      return `${msg.text}`;
     });
     return contextMessages.join("\n");
   };
@@ -130,18 +131,69 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
 
   return (
     <>
-      {visibleBot === false && (
-        <div className="interfaceContainer">
-          <div className="interfaceHeader">
-            <p className="headerTitle">Chat Interface</p>
-            <button
-              className="cancelButton"
-              onClick={() => setVisibleBot(!visibleBot)}
-            >
-              <MdOutlineCancel />
-            </button>
-          </div>
-          <div className="interfaceBody" ref={interfaceBodyRef}>
+      {!visibleBot && (
+        <Paper
+          sx={{
+            position: "fixed",
+            top: "50%",
+            left: "80%",
+            transform: "translate(-50%, -50%)",
+            width: "90vw",
+            height: "80vh",
+            maxWidth: 450,
+            maxHeight: 600,
+            backgroundColor: "white",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+            borderRadius: 2,
+            padding: 2.5,
+            zIndex: 1000,
+            display: "flex",
+            flexDirection: "column",
+            "@media (max-width: 1024px)": {
+              left: "70%",
+            },
+            "@media (max-width: 768px)": {
+              left: "60%",
+              width: "95vw",
+              height: "70vh",
+            },
+            "@media (max-width: 480px)": {
+              left: "50%",
+              width: "80vw",
+              height: "60vh",
+            },
+          }}
+        >
+          <Box
+            sx={{
+              position: "fixed",
+              top: "10px",
+              left: "20px",
+              right: "20px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingBottom: 0.5,
+              borderBottom: "1px solid #ddd",
+              zIndex: 1001,
+            }}
+          >
+            <Typography variant="body1" sx={{ fontWeight: "bold", margin: 0 }}>
+              Chat Interface
+            </Typography>
+            <IconButton onClick={() => setVisibleBot(!visibleBot)}>
+              <CancelOutlinedIcon sx={{ color: "black" }} />
+            </IconButton>
+          </Box>
+          <Box
+            ref={interfaceBodyRef}
+            sx={{
+              marginTop: 6,
+              marginBottom: 6,
+              overflowY: "auto",
+              flexGrow: 1,
+            }}
+          >
             {messages.map((msg, index) => (
               <ChatMessage
                 key={index}
@@ -152,27 +204,47 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
                 showRegenerateButton={index !== 0}
               />
             ))}
-          </div>
-          <div className="inputContainer">
-            <input
-              ref={inputRef}
+          </Box>
+          <Box
+            sx={{
+              position: "fixed",
+              bottom: "20px",
+              left: "20px",
+              right: "20px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backgroundColor: "white",
+              zIndex: 1001,
+              borderTop: "1px solid #ddd",
+            }}
+          >
+            <TextField
+              inputRef={inputRef}
               type="text"
-              className="textInput"
+              id="standard-multiline-static"
+              multiline
+              rows={1}
+              defaultValue="Default Value"
+              variant="standard"
               placeholder="Type your message..."
               value={inputMessage}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               disabled={isSending}
+              sx={{ width: "90%", fontSize: "14px" }}
             />
-            <button
-              className="sendButton"
+            <IconButton
               onClick={sendMessage}
               disabled={isSending || !inputMessage.trim()}
+              color="primary"
+              sx={{ paddingRight: "0", paddingBottom: "0" }}
             >
-              Send
-            </button>
-          </div>
-        </div>
+              {" "}
+              <TelegramIcon sx={{ fontSize: "2.5rem" }} />
+            </IconButton>
+          </Box>
+        </Paper>
       )}
     </>
   );
