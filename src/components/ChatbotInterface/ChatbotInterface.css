@@ -3,9 +3,10 @@
   top: 50%;
   left: 80%;
   transform: translate(-50%, -50%);
-  width: 450px;
-  height: 600px;
-  max-width: 90%;
+  width: 90vw;
+  height: 80vh;
+  max-width: 450px;
+  max-height: 600px;
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
@@ -87,4 +88,26 @@
 
 .textInput:focus {
   outline: 2px solid #007bff;
+}
+
+@media (max-width: 1024px) {
+  .interfaceContainer {
+    left: 70%;
+  }
+}
+
+@media (max-width: 768px) {
+  .interfaceContainer {
+    width: 95vw;
+    height: 70vh;
+    left: 60%;
+  }
+}
+
+@media (max-width: 480px) {
+  .interfaceContainer {
+    width: 80vw;
+    height: 60vh;
+    left: 50%;
+  }
 }
