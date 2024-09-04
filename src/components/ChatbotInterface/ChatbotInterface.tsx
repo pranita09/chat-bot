@@ -138,6 +138,7 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
                 text={msg.text}
                 isTyping={msg.isTyping}
                 onRegenerate={() => handleRegenerate(index)}
+                showRegenerateButton={index !== 0}
               />
             ))}
           </div>

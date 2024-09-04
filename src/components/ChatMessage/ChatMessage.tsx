@@ -5,8 +5,9 @@ import { Popover } from "../Popover/Popover";
 interface ChatMessageType {
   sender: "bot" | "user";
   text: string;
-  isTyping?: Boolean;
+  isTyping?: boolean;
   onRegenerate: () => void;
+  showRegenerateButton: boolean;
 }
 
 export const ChatMessage: React.FC<ChatMessageType> = ({
@@ -14,12 +15,12 @@ export const ChatMessage: React.FC<ChatMessageType> = ({
   text,
   isTyping,
   onRegenerate,
+  showRegenerateButton,
 }) => {
   const [showPopover, setShowPopover] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(text);
-    alert("Copied to clipboard!");
   };
 
   const handlePlayAudio = () => {
@@ -40,6 +41,7 @@ export const ChatMessage: React.FC<ChatMessageType> = ({
           onCopy={handleCopy}
           onRegenerate={onRegenerate}
           onPlayAudio={handlePlayAudio}
+          showRegenerateButton={showRegenerateButton}
         />
       )}
     </div>
