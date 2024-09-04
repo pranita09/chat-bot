@@ -116,6 +116,11 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
     }
   };
 
+  const lastBotMessageIndex = messages
+    .map((msg, index) => (msg.sender === "bot" ? index : -1))
+    .filter((index) => index !== -1)
+    .pop();
+
   useEffect(() => {
     if (interfaceBodyRef.current) {
       interfaceBodyRef.current.scrollTop =
@@ -202,6 +207,7 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
                 isTyping={msg.isTyping}
                 onRegenerate={() => handleRegenerate(index)}
                 showRegenerateButton={index !== 0}
+                isLastBotMessage={index === lastBotMessageIndex}
               />
             ))}
           </Box>

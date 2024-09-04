@@ -8,6 +8,7 @@ interface ChatMessageType {
   isTyping?: boolean;
   onRegenerate: () => void;
   showRegenerateButton: boolean;
+  isLastBotMessage: boolean;
 }
 
 export const ChatMessage: React.FC<ChatMessageType> = ({
@@ -16,6 +17,7 @@ export const ChatMessage: React.FC<ChatMessageType> = ({
   isTyping,
   onRegenerate,
   showRegenerateButton,
+  isLastBotMessage,
 }) => {
   const [showPopover, setShowPopover] = useState(false);
 
@@ -35,7 +37,7 @@ export const ChatMessage: React.FC<ChatMessageType> = ({
       alignItems={sender === "bot" ? "flex-start" : "flex-end"}
       flexDirection={sender === "bot" ? "row" : "row-reverse"}
       marginY={3}
-      marginBottom={5}
+      marginBottom={isLastBotMessage ? 5 : 3}
       position="relative"
       onMouseEnter={() => sender === "bot" && setShowPopover(true)}
       onMouseLeave={() => setShowPopover(false)}
