@@ -5,10 +5,21 @@ import React, {
   useState,
   useRef,
   useEffect,
+  ChangeEvent,
 } from "react";
-import { Box, Paper, Typography, IconButton, TextField } from "@mui/material";
-import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import {
+  Box,
+  Paper,
+  Typography,
+  IconButton,
+  TextField,
+  Menu,
+  MenuItem,
+  Badge,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import TelegramIcon from "@mui/icons-material/Telegram";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import { ChatMessage } from "./ChatMessage";
 
 interface ChatbotInterfaceType {
@@ -27,6 +38,45 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
   const [isSending, setIsSending] = useState<boolean>(false);
   const interfaceBodyRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedFileUri, setUploadedFileUri] = useState<string | null>(null);
+
+  const handlePinClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files && event.target.files[0];
+    // if (file) {
+    //   setUploadedFile(file);
+    //   console.log("File uploaded:", file);
+
+    //   try {
+    //     // Convert the file to a Base64 string
+    //     const base64 = await fileToBase64(file);
+    //     setUploadedFileUri(base64);
+    //     console.log(`File Base64 URI: ${base64}`);
+    //   } catch (error) {
+    //     console.error("Error converting file to Base64:", error);
+    //   }
+    // }
+    handleClose();
+  };
+
+  // Function to convert a file to a Base64 string
+  // const fileToBase64 = (file: File): Promise<string> => {
+  //   return new Promise((resolve, reject) => {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => resolve(reader.result as string);
+  //     reader.onerror = reject;
+  //     reader.readAsDataURL(file);
+  //   });
+  // };
 
   const constructContext = (maxContextLength: number = 5) => {
     const contextMessages = messages.slice(-maxContextLength).map((msg) => {
@@ -48,10 +98,19 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
       });
 
       const context = constructContext();
+      const promptData = uploadedFileUri
+        ? [
+            {
+              fileData: {
+                mimeType: uploadedFile?.type || "text/plain",
+                fileUri: uploadedFileUri,
+              },
+            },
+            { text: `${userMessage}\n${context}` },
+          ]
+        : [{ text: `${userMessage}\n${context}` }];
 
-      const result = await model.generateContent(
-        `${context}\nUser: ${userMessage}`
-      );
+      const result = await model.generateContent(promptData);
       const botResponse = result.response.text();
       setMessages((prevMessages) => {
         const updatedMessages = [...prevMessages];
@@ -66,6 +125,9 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
 
         return updatedMessages;
       });
+
+      setUploadedFile(null);
+      setUploadedFileUri(null);
     } catch (error) {
       console.error("Error fetching OpenAI response:", error);
       setMessages((prevMessages) => {
@@ -98,12 +160,12 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
 
   const handleRegenerate = (index: number) => {
     const userMessage = messages[index - 1].text;
-    setMessages((prevMessages) => {
-      const updatedMessages = [...prevMessages];
-      updatedMessages[index] = { sender: "bot", text: "", isTyping: true };
-      return updatedMessages;
-    });
-    getResponse(userMessage, index);
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { sender: "user", text: userMessage },
+      { sender: "bot", text: "", isTyping: true },
+    ]);
+    getResponse(userMessage);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,7 +188,7 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
       interfaceBodyRef.current.scrollTop =
         interfaceBodyRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, visibleBot]);
 
   useEffect(() => {
     if (!isSending && inputRef.current) {
@@ -187,7 +249,7 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
               Chat Interface
             </Typography>
             <IconButton onClick={() => setVisibleBot(!visibleBot)}>
-              <CancelOutlinedIcon sx={{ color: "black" }} />
+              <CloseIcon sx={{ color: "black" }} />
             </IconButton>
           </Box>
           <Box
@@ -225,13 +287,101 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
               borderTop: "1px solid #ddd",
             }}
           >
+            <Badge
+              color="secondary"
+              variant="dot"
+              invisible={!uploadedFile}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+            >
+              <IconButton
+                onClick={handlePinClick}
+                sx={{ marginRight: "0.25rem" }}
+              >
+                <AttachFileIcon sx={{ fontSize: "1.25rem" }} />
+              </IconButton>
+            </Badge>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+            >
+              <MenuItem>
+                <label
+                  htmlFor="image-upload"
+                  style={{ cursor: "pointer", fontSize: "12px" }}
+                >
+                  Attach Image
+                  <input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleFileUpload}
+                  />
+                </label>
+              </MenuItem>
+              <MenuItem>
+                <label
+                  htmlFor="pdf-upload"
+                  style={{ cursor: "pointer", fontSize: "12px" }}
+                >
+                  Attach PDF File
+                  <input
+                    id="pdf-upload"
+                    type="file"
+                    accept="application/pdf"
+                    style={{ display: "none" }}
+                    onChange={handleFileUpload}
+                  />
+                </label>
+              </MenuItem>
+              <MenuItem>
+                <label
+                  htmlFor="video-upload"
+                  style={{ cursor: "pointer", fontSize: "12px" }}
+                >
+                  Attach Video
+                  <input
+                    id="video-upload"
+                    type="file"
+                    accept="video/*"
+                    style={{ display: "none" }}
+                    onChange={handleFileUpload}
+                  />
+                </label>
+              </MenuItem>
+              <MenuItem>
+                <label
+                  htmlFor="audio-upload"
+                  style={{ cursor: "pointer", fontSize: "12px" }}
+                >
+                  Attach Audio
+                  <input
+                    id="audio-upload"
+                    type="file"
+                    accept="audio/*"
+                    style={{ display: "none" }}
+                    onChange={handleFileUpload}
+                  />
+                </label>
+              </MenuItem>
+            </Menu>
             <TextField
               inputRef={inputRef}
-              type="text"
               id="standard-multiline-static"
               multiline
-              rows={1}
-              defaultValue="Default Value"
+              maxRows={3}
               variant="standard"
               placeholder="Type your message..."
               value={inputMessage}
@@ -248,7 +398,7 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
               sx={{ paddingRight: "0", paddingBottom: "0" }}
             >
               {" "}
-              <TelegramIcon sx={{ fontSize: "2.5rem" }} />
+              <TelegramIcon sx={{ fontSize: "2rem" }} />
             </IconButton>
           </Box>
         </Paper>
