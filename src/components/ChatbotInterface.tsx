@@ -51,7 +51,7 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
   };
 
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files && event.target.files[0];
+    // const file = event.target.files && event.target.files[0];
     // if (file) {
     //   setUploadedFile(file);
     //   console.log("File uploaded:", file);
@@ -281,7 +281,7 @@ export const ChatbotInterface: React.FC<ChatbotInterfaceType> = ({
               right: "20px",
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "center",
+              alignItems: "flex-end",
               backgroundColor: "white",
               zIndex: 1001,
               borderTop: "1px solid #ddd",
