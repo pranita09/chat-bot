@@ -13,7 +13,7 @@ export const ChatbotHandler: React.FC<ChatbotHandlerType> = ({
 }) => {
   return (
     <>
-      {visibleBot && (
+      {visibleBot ? (
         <IconButton
           onClick={() => setVisibleBot(!visibleBot)}
           sx={{
@@ -46,7 +46,7 @@ export const ChatbotHandler: React.FC<ChatbotHandlerType> = ({
             <ChatIcon sx={{ fontSize: "2rem", color: "black" }} />
           </Box>
         </IconButton>
-      )}
+      ) : null}
     </>
   );
 };

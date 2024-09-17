@@ -22,8 +22,14 @@ function App() {
           Learn React
         </a>
       </header>
-      <ChatbotInterface visibleBot={visibleBot} setVisibleBot={setVisibleBot} />
-      <ChatbotHandler visibleBot={visibleBot} setVisibleBot={setVisibleBot} />
+      {visibleBot ? (
+        <ChatbotHandler visibleBot={visibleBot} setVisibleBot={setVisibleBot} />
+      ) : (
+        <ChatbotInterface
+          visibleBot={visibleBot}
+          setVisibleBot={setVisibleBot}
+        />
+      )}
     </div>
   );
 }
